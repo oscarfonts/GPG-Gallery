@@ -57,7 +57,7 @@
       var thumbnail = document.createElement("div"); thumbnail.className = "thumbnail";
       var image = getImage(attachment.data); image.style.maxHeight = "256px";
       var caption = document.createElement("div"); caption.className = "caption";
-      caption.innerHTML = "<h3>Parada " + parada + "</h3><h5>" + user + "</h5><p>" + moment(date).fromNow() + "</p>";
+      caption.innerHTML = "<h3>Parada " + parada + "</h3><h5>" + moment(date).fromNow() + "</h5>";
      
       thumbnail.appendChild(image);
       thumbnail.appendChild(caption);
