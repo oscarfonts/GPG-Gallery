@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPG-Gallery</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css">
+  <style>
+    body {
+      padding-top: 50px;
+    }
+    .navbar-inverse {
+      background-color: #FF0000;
+      border-color: #FF0000;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">GPG-Gallery</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row" id="gallery"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/pouchdb/6.2.0/pouchdb.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script>
+    var db = new PouchDB('https://demo.fonts.cat/couchdb/geoportalgo');
+    db.allDocs({
+      include_docs: true,
+      attachments: true,
+      binary: true
+    }).then(function(result) {
+      result.rows.sort(sortByDate).map(({doc}) => render(doc));
+    }).catch(function (err) {
+      console.log(err);
+    });
+
+    function sortByDate(a, b) {
+      return new Date(b.doc.date) - new Date(a.doc.date);
+    }
+
+    function render(doc) {
+      var {user, date, parada, _attachments} = doc;
+      var attachment = Object.values(_attachments)[0];
+
+      var gallery = document.getElementById("gallery");
+      var column = document.createElement("div"); column.className = "col-xs-12 col-sm-6 col-md-4 col-lg-3";
+      var thumbnail = document.createElement("div"); thumbnail.className = "thumbnail";
+      var image = getImage(attachment.data); image.style.maxHeight = "256px";
+      var caption = document.createElement("div"); caption.className = "caption";
+      caption.innerHTML = "<h3>Parada " + parada + "</h3><h5>" + user + "</h5><p>" + moment(date).fromNow() + "</p>";
+     
+      thumbnail.appendChild(image);
+      thumbnail.appendChild(caption);
+      column.appendChild(thumbnail);
+      gallery.appendChild(column);
+
+    }
+
+    function getImage(blob) {
+      var image = new Image();
+      image.src = URL.createObjectURL(blob);
+      return image;
+    }
+  </script>
+</body>
+</html>
