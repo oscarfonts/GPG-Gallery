@@ -49,7 +49,7 @@
     }
 
     function render(doc) {
-      var {user, date, linia, estacio, _attachments} = doc;
+      var {user, date, id, codi, etiqueta, _attachments} = doc;
       var attachment = Object.values(_attachments)[0];
 
       var gallery = document.getElementById("gallery");
@@ -57,7 +57,7 @@
       var thumbnail = document.createElement("div"); thumbnail.className = "thumbnail";
       var image = getImage(attachment.data); image.style.maxHeight = "256px";
       var caption = document.createElement("div"); caption.className = "caption";
-      caption.innerHTML = "<h3>Linia " + linia + ", estació " + estacio + "</h3><h5>" + moment(date).fromNow() + "</h5>";
+      caption.innerHTML = "<h3>[" + codi + "] " + etiqueta + "</h3><h5>" + moment(date).fromNow() + "</h5>";
      
       thumbnail.appendChild(image);
       thumbnail.appendChild(caption);
