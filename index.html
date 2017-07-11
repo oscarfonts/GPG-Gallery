@@ -10,10 +10,61 @@
     body {
       padding-top: 50px;
     }
+
+    .row {
+      padding-top: 50px;
+    }
+
     .navbar-inverse {
       background-color: #FF0000;
       border-color: #FF0000;
     }
+
+    .thumbnail {
+      height: 400px;
+    }
+
+    .wrapper {
+      margin-top: 80px;
+      margin-bottom: 80px;
+    }
+
+    .form-signin {
+      max-width: 380px;
+      padding: 15px 35px 45px;
+      margin: 0 auto;
+      background-color: #fff;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+     form-signin-heading,
+     checkbox {
+      margin-bottom: 30px;
+     }
+
+    .checkbox {
+      font-weight: normal;
+    }
+
+    .form-control {
+      position: relative;
+      font-size: 16px;
+      height: auto;
+      padding: 10px;
+    }
+
+    input[type="text"] {
+      margin-bottom: -1px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    input[type="password"] {
+      margin-bottom: 20px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
   </style>
 </head>
 <body>
@@ -27,22 +78,46 @@
   </nav>
 
   <div class="container">
+    <div class="row" id="form">
+      <form class="form-signin">
+        <h2 class="form-signin-heading">CouchDB credentials</h2>
+        <input type="text" class="form-control" name="username" placeholder="Username" required="" value="geoportalgo" />
+        <input type="password" id="password" class="form-control" name="password" placeholder="Password" required="" autofocus=""/>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="return showGallery()">Get photos</button>
+      </form>
+    </div>
     <div class="row" id="gallery"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/pouchdb/6.2.0/pouchdb.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
   <script>
-    var db = new PouchDB('https://demo.fonts.cat/couchdb/geoportalgo');
-    db.allDocs({
-      include_docs: true,
-      attachments: true,
-      binary: true
-    }).then(function(result) {
-      result.rows.sort(sortByDate).map(({doc}) => render(doc));
-    }).catch(function (err) {
-      console.log(err);
-    });
+    function showGallery(ev) {
+      document.getElementById("gallery").innerHTML = "Querying...";
+      var options = {
+        ajax: {
+          headers: {
+            Authorization: 'Basic ' + window.btoa('geoportalgo:' + document.getElementById("password").value)
+          }
+        }
+      };
+      var db = new PouchDB('https://demo.fonts.cat/couchdb/geoportalgo', options);
+      db.allDocs({
+        include_docs: true,
+        attachments: true,
+        binary: true
+      }).then(function(result) {
+        document.getElementById("gallery").innerHTML = "";
+        result.rows.sort(sortByDate).map(({doc}) => render(doc));
+      }).catch(function (err) {
+        if (err.status && err.status === 401) {
+          document.getElementById("gallery").innerHTML = err.message;
+        } else {
+          console.log(err);
+        }
+      });
+      return false;
+    }
 
     function sortByDate(a, b) {
       return new Date(b.doc.date) - new Date(a.doc.date);
